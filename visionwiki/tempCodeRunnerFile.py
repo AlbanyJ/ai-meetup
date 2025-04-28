@@ -1,1 +1,0 @@
-        st.warning("Please type a message before sending.")
