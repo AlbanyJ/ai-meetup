@@ -10,7 +10,7 @@ api_key = os.getenv("GROQ_API_KEY")
 
 client = Groq(api_key=api_key)
 
-# Streamlit app UI
+# Streamlit app user interface
 st.title("VISIONWIKI")
 st.write("ESSAIE-MOI!")
 
