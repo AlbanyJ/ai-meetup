@@ -40,9 +40,9 @@ def describe_with_groq(caption):
         return f"❌ Error contacting Groq API: {e}"
 
 # Streamlit UI
-st.set_page_config(page_title="🧠 Vision Tool", page_icon="🖼️")
+st.set_page_config(page_title="🧠 WikiVision", page_icon="🖼️")
 st.markdown("""
-    <h1 style='text-align: center; color: #4CAF50;'>🧠 Vision Tool</h1>
+    <h1 style='text-align: center; color: #4CAF50;'>🧠 WikiVision</h1>
     <h4 style='text-align: center;'>Upload or paste an image URL to get a description.</h4>
     <br>
 """, unsafe_allow_html=True)
