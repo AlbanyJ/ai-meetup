@@ -1,8 +1,12 @@
 from groq import Groq
 from dotenv import load_dotenv
-
 import os
+import ghana_nlp
 import streamlit as st
+from PIL import Image
+import requests
+from io import BytesIO
+import base64
 
 load_dotenv()
 
@@ -10,68 +14,68 @@ api_key = os.getenv("GROQ_API_KEY")
 
 client = Groq(api_key=api_key)
 
-# Streamlit app user interface
-st.title("VISIONWIKI")
-st.write("ESSAIE-MOI!")
 
-user_input = st.text_input("TRY ME: ")
+# Optional: replace this with your actual vision model
+def mock_image_description(image):
+     # Call the Groq API to get a response
+    response = client.chat.completions.create(
+        messages=[
+            {
+            "role": "system",
+            "content": "you are a helpful assistant."
+        },
+        # Set a user message for the assistant to respond to.
+        {
+            "role": "user",
+            "content": "Describe the image in detail.",
+        }
+        ],
+        model="meta-llama/llama-4-maverick-17b-128e-instruct",
+        temperature=0.5,
+        max_completion_tokens=1024,
+        top_p=1,
+        stop=None,
+        stream=False,
+    )
+    
+    return response.choices[0].message.content
 
 
-if st.button("Send"):
-    if user_input:
-        chat_completion = client.chat.completions.create(
-            #
-            # Required parameters
-            #
-            messages=[
-                # Set an optional system message. This sets the behavior of the
-                # assistant and can be used to provide specific instructions for
-                # how it should behave throughout the conversation.
-                {
-                    "role": "system",
-                    "content": "you are a helpful assistant."
-                },
-                # Set a user message for the assistant to respond to.
-                {
-                    "role": "user",
-                    "content": user_input,
-                }
-            ],
+st.set_page_config(page_title="🧠 Vision Tool", page_icon="🖼️")
+st.markdown(
+    """
+    <h1 style='text-align: center; color: #4CAF50;'>🧠 Vision Tool</h1>
+    <h4 style='text-align: center;'>Upload or paste an image URL to get a description.</h4>
+    <br>
+    """,
+    unsafe_allow_html=True
+)
 
-            # The language model which will generate the completion.
-            model="llama-3.3-70b-versatile",
+# Upload or URL
+upload_tab, url_tab = st.tabs(["📁 Upload Image", "🔗 Image URL"])
 
-            #
-            # Optional parameters
-            #
+image = None
 
-            # Controls randomness: lowering results in less random completions.
-            # As the temperature approaches zero, the model will become deterministic
-            # and repetitive.
-            temperature=0.5,
+with upload_tab:
+    uploaded_file = st.file_uploader("Choose an image file", type=["jpg", "jpeg", "png"])
+    if uploaded_file:
+        image = Image.open(uploaded_file)
 
-            # The maximum number of tokens to generate. Requests can use up to
-            # 32,768 tokens shared between prompt and completion.
-            max_completion_tokens=1024,
+with url_tab:
+    image_url = st.text_input("Paste image URL here:")
+    if image_url:
+        try:
+            response = requests.get(image_url)
+            image = Image.open(BytesIO(response.content))
+        except Exception as e:
+            st.error(f"Couldn't load image from URL: {e}")
 
-            # Controls diversity via nucleus sampling: 0.5 means half of all
-            # likelihood-weighted options are considered.
-            top_p=1,
+if image:
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+    
+    if st.button("🔍 Describe Image"):
+        with st.spinner("Analyzing image..."):
+            # Replace this with actual vision model call
+            description = mock_image_description(image)
 
-            # A stop sequence is a predefined or user-specified text string that
-            # signals an AI to stop generating content, ensuring its responses
-            # remain focused and concise. Examples include punctuation marks and
-            # markers like "[end]".
-            stop=None,
-
-            # If set, partial message deltas will be sent.
-            stream=False,
-        )
-
-    # Print the completion returned by the LLM.
-   # print(chat_completion.choices[0].message.content)
-
-        response = chat_completion.choices[0].message.content
-        st.success(response)
-    else:
-        st.warning("Please type a message before sending.")
+            st.markdown(f"### 📝 Description:\n{description}")
