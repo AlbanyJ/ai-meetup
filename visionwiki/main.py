@@ -9,6 +9,8 @@ from io import BytesIO
 import base64
 
 load_dotenv()
+api_key = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=api_key, timeout=60)
 
 api_key = os.getenv("GROQ_API_KEY")
 
@@ -34,8 +36,8 @@ def mock_image_description(image):
         temperature=0.5,
         max_completion_tokens=1024,
         top_p=1,
-        stop=None,
-        stream=False,
+        #stop=None,
+        #stream=False,
     )
     
     return response.choices[0].message.content

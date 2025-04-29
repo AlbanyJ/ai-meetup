@@ -32,7 +32,7 @@ def describe_with_groq(caption):
                 {"role": "user", "content": f"Based on this image caption: '{caption}', give a detailed description of what the image might show."}
             ],
             temperature=0.5,
-            max_completion_tokens=512,
+            max_completion_tokens=1024,
             top_p=1
         )
         return response.choices[0].message.content
